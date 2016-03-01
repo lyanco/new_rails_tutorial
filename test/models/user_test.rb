@@ -64,7 +64,7 @@ class UserTest < ActiveSupport::TestCase
     uppercase_email = "TEST@TEST.coM"
     @user.email = uppercase_email
     @user.save
-    assert_equal uppercase_email.downcase, @user.email
+    assert_equal uppercase_email.downcase, @user.reload.email
   end
 
   test "passwords should match" do
