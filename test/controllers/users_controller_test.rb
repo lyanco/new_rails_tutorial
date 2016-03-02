@@ -5,6 +5,7 @@ class UsersControllerTest < ActionController::TestCase
     get :new
     assert_response :success
     assert_select "title", "Sign up | RoR Tutorial Sample App"
+    assert_instance_of User, assigns(:user)
   end
 
 end
