@@ -32,4 +32,20 @@ class UserActionsTest < Capybara::Rails::TestCase
     assert current_path, users_new_path
   end
 
+  test "visiting login should show email and password" do
+    visit login_path
+    assert_content page, "Email"
+    assert_content page, "Password"
+  end
+
+  test "I should log in and see my name" do
+    visit login_path
+    fill_in('Email', with: 'lee@example.com')
+    fill_in('Password', with: 'password')
+    click_button('Log in')
+
+    assert_content page, 'Lee Yanco'
+
+  end
+
 end
