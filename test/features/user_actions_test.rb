@@ -48,4 +48,15 @@ class UserActionsTest < Capybara::Rails::TestCase
 
   end
 
+  test "I should be able to log out" do
+    visit login_path
+    fill_in('Email', with: 'lee@example.com')
+    fill_in('Password', with: 'password')
+    click_button('Log in')
+    click_link('Log out')
+    assert_content page, 'Log in'
+
+
+  end
+
 end

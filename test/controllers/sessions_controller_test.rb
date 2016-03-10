@@ -20,6 +20,13 @@ class SessionsControllerTest < ActionController::TestCase
     assert_response :redirect
   end
 
+  test "should destroy login" do
+    post :create, session: { email: "user2@example.com",
+                             password: "password2" }
+    delete :destroy
+    assert_response :redirect
+  end
+
 
 
 end

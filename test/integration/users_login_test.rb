@@ -11,16 +11,26 @@ class UsersLoginTest < ActionDispatch::IntegrationTest
     assert_template 'sessions/new'
   end
 
-  test "user should be able to log in with valid information" do
+  test "user should be able to log in with valid information followed by logout" do
     get login_path
     post login_path, session: { email: "lee@example.com",
                                              password: "password"}
+    assert is_logged_in?
     assert_redirected_to @user
     follow_redirect!
     assert_template 'users/show'
     assert_select "a[href=?]", login_path, count: 0
     assert_select "a[href=?]", logout_path
     assert_select "a[href=?]", user_path(@user)
+
+    delete logout_path
+    assert_not is_logged_in?
+    assert_redirected_to root_url
+    follow_redirect!
+    assert_template 'static_pages/home'
+    assert_select "a[href=?]", login_path
+    assert_select "a[href=?]", logout_path, count: 0
+    assert_select "a[href=?]", user_path(@user), count: 0
   end
 
   test "user should fail to log in with invalid information" do
@@ -39,5 +49,6 @@ class UsersLoginTest < ActionDispatch::IntegrationTest
     get root_path
     assert flash.empty?, "flash shows on second page"
   end
+
 
 end
