@@ -9,6 +9,7 @@
 
 # Ignore random rubymine stuff
 .idea/
+.idea/workspace.xml
 
 # Ignore the default SQLite database.
 /db/*.sqlite3

@@ -56,7 +56,8 @@ class UserActionsTest < Capybara::Rails::TestCase
     click_link('Log out')
     assert_content page, 'Log in'
 
-
   end
+
+
 
 end
