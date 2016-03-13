@@ -49,7 +49,8 @@ class UserActionsTest < Capybara::Rails::TestCase
   end
 
   test "I should be able to log out" do
-    visit login_path
+    visit root_path
+    click_link('Log in')
     fill_in('Email', with: 'lee@example.com')
     fill_in('Password', with: 'password')
     click_button('Log in')
@@ -57,6 +58,24 @@ class UserActionsTest < Capybara::Rails::TestCase
     assert_content page, 'Log in'
 
   end
+
+  test "I should be able to see my info edited" do
+    visit root_path
+    click_link('Log in')
+    fill_in('Email', with: 'lee@example.com')
+    fill_in('Password', with: 'password')
+    click_button('Log in')
+    click_link('Settings')
+    assert_content page, 'Update your profile'
+    assert_content page, 'Confirmation'
+    fill_in('Password', with: 'password')
+    fill_in('Confirmation', with: 'password')
+    click_button('Save changes')
+    assert_content page, 'Profile updated'
+
+  end
+
+
 
 
 
