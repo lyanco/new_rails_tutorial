@@ -5,6 +5,7 @@ class UsersControllerTest < ActionController::TestCase
   def setup
     @user = users(:lee)
     @user2 = users(:notlee)
+    @admin = users(:admin)
   end
 
   test "should get new" do
@@ -58,6 +59,55 @@ class UsersControllerTest < ActionController::TestCase
     patch :update, id: @user, user: { name: @user.name, email: @user.email }
     assert flash.empty?
     assert_redirected_to root_url
+  end
+
+  test "should get index" do
+    log_in_as(@user)
+    get :index
+    assert_response :success
+    assert_equal User.first, assigns(:users).first
+    assert_select "title", "Users | RoR Tutorial Sample App"
+  end
+
+  test "should redirect index when not logged in" do
+    get :index
+    assert_redirected_to login_url
+  end
+
+  test "should respond to delete" do
+    log_in_as(@admin)
+    assert_difference 'User.count', -1 do
+      delete :destroy, id: @user
+    end
+    assert_redirected_to users_path
+  end
+
+  test "should not delete for non-admins" do
+    #puts @user
+    assert_no_difference 'User.count' do
+      delete :destroy, id: @user
+    end
+    assert_redirected_to login_path
+    #puts @user
+    assert_not @user.nil?
+    log_in_as(@user2)
+    assert_no_difference 'User.count' do
+      delete :destroy, id: @user
+    end
+    assert_redirected_to root_url
+    #puts @user
+    assert_not @user.nil?
+
+  end
+
+  test "should not be able to add an admin flag" do
+    patch :update, id: @user, user: { admin: true }
+    @user.reload
+    assert_not @user.admin?
+    log_in_as(@user)
+    patch :update, id: @user, user: { admin: true }
+    @user.reload
+    assert_not @user.admin?
   end
 
 end

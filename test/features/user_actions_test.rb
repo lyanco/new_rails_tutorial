@@ -1,9 +1,10 @@
 require "test_helper"
+require "nokogiri"
 
 class UserActionsTest < Capybara::Rails::TestCase
 
 
-  test "full feature" do
+  test "full feature spec" do
     #layout should include name and email
     visit users_new_path
     assert_content page, "Name"
@@ -31,13 +32,12 @@ class UserActionsTest < Capybara::Rails::TestCase
     assert_content page, 'Log in'
 
     #When I visit the login page
-    visit login_path
+    click_link('Log in')
     #Then I should see a prompt for email and password
     assert_content page, "Email"
     assert_content page, "Password"
 
     #When I log in
-    visit login_path
     fill_in('Email', with: 'lee@example.com')
     fill_in('Password', with: 'password')
     click_button('Log in')
@@ -54,6 +54,37 @@ class UserActionsTest < Capybara::Rails::TestCase
     click_button('Save changes')
     #Then I should see a prompt that my profile has been updated
     assert_content page, 'Profile updated'
+
+    #When I visit the all users page
+    click_link("Users")
+    #Then I should see a list of users in the system
+    assert_content("All users")
+    assert_content("Lee Yanco")
+    assert_content("Notlee Yanco")
+    #And I should see pagination
+    assert_content("2")
+
+  end
+
+  test "admin should be able to delete users" do
+    #Given I have logged in as an admin
+    visit login_path
+    fill_in('Email', with: 'admin@example.com')
+    fill_in('Password', with: 'password')
+    click_button('Log in')
+    #When I go to the users index
+    click_link("Users")
+    #Then I should see links to delete
+    assert_selector "a", text: "delete", count: 29
+    assert_content("Lee Yanco")
+    #When I click one
+    document = Nokogiri::HTML(page.body)
+    links    = document.css('.users').css('li a')
+    user_to_delete = links[0].text == 'Admin McAdminson' ?
+        links[1].text : links[0].text
+    first(:link, "delete").click
+    #Then that user should no longer appear
+    assert_no_content(user_to_delete)
   end
 
 end
