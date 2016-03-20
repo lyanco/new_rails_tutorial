@@ -101,6 +101,11 @@ class UsersControllerTest < ActionController::TestCase
   end
 
   test "should not be able to add an admin flag" do
+    post :create, user: { name: "1", email: "newuser@example.com",
+                                    password: "password", password_confirmation:"password",
+                                    admin: true }
+    @newuser = User.find_by_email("newuser@example.com")
+    assert_not @newuser.admin?
     patch :update, id: @user, user: { admin: true }
     @user.reload
     assert_not @user.admin?

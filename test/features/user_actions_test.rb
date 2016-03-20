@@ -23,8 +23,11 @@ class UserActionsTest < Capybara::Rails::TestCase
     fill_in('Password', with: 'abcdefgh')
     fill_in('Confirmation', with: 'abcdefgh')
     click_link_or_button('Create my account')
-    #Then I should see my name and a welcome message and be logged in
-    assert_content page, "Welcome to the Sample App!"
+    #And click the link in my account activation email
+    last_email = ActionMailer::Base.deliveries.last
+    visit Nokogiri::HTML(last_email.to_s).css('a')[0].values[0]
+    #Then I should see my name and be logged in
+    assert_content page, "Account activated"
     assert_content page, 'Test McTesterson'
     #When I log out
     click_link('Log out')
