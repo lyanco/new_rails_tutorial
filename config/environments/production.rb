@@ -62,7 +62,22 @@ Rails.application.configure do
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  # config.action_mailer.raise_delivery_errors = false
+  config.action_mailer.raise_delivery_errors = true
+
+  credentials = host = username = password = ''
+  if !ENV['VCAP_SERVICES'].blank?
+    JSON.parse(ENV['VCAP_SERVICES']).each do |k,v|
+      if !k.scan("sendgrid").blank?
+        credentials = v.first.select {|k1,v1| k1 == "credentials"}["credentials"]
+        host = credentials["hostname"]
+        username = credentials["username"]
+        password = credentials["password"]
+      end
+    end
+  end
+
+  config.action_mailer.default_url_options = { :host => 'new-rails-tutorial-ly.cfapps.io' }
+
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

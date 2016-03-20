@@ -24,8 +24,7 @@ class UserActionsTest < Capybara::Rails::TestCase
     fill_in('Confirmation', with: 'abcdefgh')
     click_link_or_button('Create my account')
     #And click the link in my account activation email
-    last_email = ActionMailer::Base.deliveries.last
-    visit Nokogiri::HTML(last_email.to_s).css('a')[0].values[0]
+    visit Nokogiri::HTML(last_email).css('a')[0].values[0]
     #Then I should see my name and be logged in
     assert_content page, "Account activated"
     assert_content page, 'Test McTesterson'
@@ -45,6 +44,28 @@ class UserActionsTest < Capybara::Rails::TestCase
     fill_in('Password', with: 'password')
     click_button('Log in')
     #Then I should see my name on the page
+    assert_content page, 'Lee Yanco'
+
+    #When I click forget my password
+    click_link('Log out')
+    click_link('Log in')
+    click_link('(forgot password)')
+    #And fill in my email
+    fill_in('Email', with: 'lee@example.com')
+    click_button('Submit')
+    #Then I should receive an email to reset my password
+    visit Nokogiri::HTML(last_email).css('a')[0].values[0]
+    #When I input a new password and submit
+    fill_in('Password', with: 'password1')
+    fill_in('Confirmation', with: 'password1')
+    click_button('Update password')
+    assert_content page, 'Lee Yanco'
+    #Then I should be able to log in with that password
+    click_link('Log out')
+    click_link('Log in')
+    fill_in('Email', with: 'lee@example.com')
+    fill_in('Password', with: 'password1')
+    click_button('Log in')
     assert_content page, 'Lee Yanco'
 
     #When I go to settings

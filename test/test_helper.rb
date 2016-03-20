@@ -34,6 +34,10 @@ class ActiveSupport::TestCase
     end
   end
 
+  def last_email
+    return ActionMailer::Base.deliveries.last.to_s
+  end
+
   private
 
     # Returns true inside an integration test.
