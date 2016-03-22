@@ -8,16 +8,13 @@ class UsersEditTest < ActionDispatch::IntegrationTest
 
   test "edit should patch for the user" do
     get edit_user_path(@user)
-    #puts session[:forwarding_url]
     patch user_path(@user), user: { name: "bla",
                                     email: "blahblah",
                                     password: "",
                                     password_confirmation: "" }
-    #puts session[:forwarding_url]
     log_in_as(@user)
     assert_redirected_to edit_user_path(@user)
     follow_redirect!
-    puts session[:forwarding_url]
     assert_template 'users/edit'
     name  = "Foo Bar"
     email = "foo@bar.com"
