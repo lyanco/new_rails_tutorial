@@ -29,3 +29,6 @@
 
 # Ignore gems installed in local directory
 /vendor/bundle/
+
+# Ignore uploaded test images.
+/public/uploads
