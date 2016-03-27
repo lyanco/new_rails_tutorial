@@ -97,8 +97,34 @@ class UserTest < ActiveSupport::TestCase
     end
   end
 
-  test "feed should return all microposts" do
-    assert_equal Micropost.where("user_id = " + @complex_user.id.to_s), @complex_user.feed
+
+  test "should follow and unfollow a user" do
+    lee = users(:lee)
+    archer = users(:archer)
+    assert_not lee.following?(archer)
+    lee.follow(archer)
+    assert lee.following?(archer)
+    assert archer.followers.include?(lee)
+    lee.unfollow(archer)
+    assert_not lee.following?(archer)
+  end
+
+  test "feed should have the right posts" do
+    lee = users(:lee)
+    archer = users(:archer)
+    lana = users(:lana)
+    #posts from followed user
+    lana.microposts.each do |post_following|
+      assert lee.feed.include?(post_following)
+    end
+    #posts from self
+    lee.microposts.each do |post_self|
+      assert lee.feed.include?(post_self)
+    end
+    # Posts from unfollowed user
+    archer.microposts.each do |post_unfollowed|
+      assert_not lee.feed.include?(post_unfollowed)
+    end
   end
 
 end

@@ -4,6 +4,8 @@ class MicropostsInterfaceTest < ActionDispatch::IntegrationTest
 
   def setup
     @user = users(:lee)
+    @other_user = users(:malory)
+    @third_user = users(:notlee)
   end
 
   test "root page should show microposts to user when logged in" do
@@ -17,7 +19,7 @@ class MicropostsInterfaceTest < ActionDispatch::IntegrationTest
     log_in_as(@user)
     get root_path
     @user.feed.paginate(page: 1).each do |micropost|
-      assert_match micropost.content, response.body
+      assert_match CGI.escapeHTML(micropost.content), response.body
     end
   end
 
@@ -51,5 +53,14 @@ class MicropostsInterfaceTest < ActionDispatch::IntegrationTest
     get user_path(users(:notlee))
     assert_select 'a', text: 'delete', count: 0
   end
+
+  test "following should appear on the user show" do
+    log_in_as(@user)
+    get root_path
+    #puts response.body
+    assert_select '#following', text: "2"
+    assert_select '#followers', text: "2"
+  end
+
 
 end

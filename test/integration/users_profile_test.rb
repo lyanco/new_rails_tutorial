@@ -6,6 +6,8 @@ class UsersProfileTest < ActionDispatch::IntegrationTest
   def setup
     @user = users(:lee)
     @micropost = @user.microposts.first
+    @other_user = users(:archer)
+    @third_user = users(:lana)
   end
 
   test "micropost should appear on the user show" do
@@ -23,6 +25,23 @@ class UsersProfileTest < ActionDispatch::IntegrationTest
     @user.microposts.paginate(page: 1).each do |micropost|
       assert_match micropost.content, response.body
     end
+  end
+
+  test "following should appear on the user show" do
+    get user_path(@user)
+    assert_select '#following', text: "2"
+    assert_select '#followers', text: "2"
+    assert_select 'input[type=submit][value=Follow]', count: 0
+    assert_select 'input[type=submit][value=Unfollow]', count: 0
+  end
+
+  test "actions should appear on other user shows" do
+    log_in_as(@user)
+    get user_path(@other_user)
+    assert_select 'input[type=submit][value=Follow]'
+    @user.follow(@other_user)
+    get user_path(@other_user)
+    assert_select 'input[type=submit][value=Unfollow]'
   end
 
 end
